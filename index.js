@@ -24,6 +24,33 @@ async function run() {
     const menuCollections = client.db("e-commerce-perform").collection("menus");
     const discountCollections = client.db("e-commerce-perform").collection("discounts");
     const bestSellerCollections = client.db("e-commerce-perform").collection("bestSeller");
+    const userCollections = client.db("e-commerce-perform").collection("users");
+
+
+    app.post('/users', async(req, res)=>{
+      const item = req.body;
+      console.log(item);
+      const result = await userCollections.insertOne(item);
+      res.send(result)
+    })
+
+    app.get('/userInfo/:email', async (req, res) => {
+  const email = req.params.email;
+  console.log(email);
+  try {
+    const filter = { email: email };
+    const result = await userCollections.findOne(filter);
+    if (result) {
+      res.send(result);
+    } else {
+      res.status(404).send({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 
     app.get('/allMenus', async (req, res) => {
       try {
