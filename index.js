@@ -26,6 +26,8 @@ async function run() {
     const bestSellerCollections = client.db("e-commerce-perform").collection("bestSeller");
     const addToCartCollections = client.db("e-commerce-perform").collection("addToCart");
     const allOrderCollections = client.db("e-commerce-perform").collection("allOrders");
+    const vegitableCollections = client.db("e-commerce-perform").collection("vegitables");
+    const FreshFruitCollections = client.db("e-commerce-perform").collection("FreshFruit");
     const SpecialOfferCollections = client.db("e-commerce-perform").collection("SpecialOffer");
     const dontMissCollections = client.db("e-commerce-perform").collection("dontMiss");
     const userCollections = client.db("e-commerce-perform").collection("users");
@@ -106,6 +108,25 @@ async function run() {
 app.get('/allMenus', async (req, res) => {
   try {
     const result = await menuCollections.find().toArray();
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching menus:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get('/vegitables', async (req, res) => {
+  try {
+    const result = await vegitableCollections.find().toArray();
+    res.send(result);
+  } catch (error) {
+    console.error("Error fetching menus:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.get('/freshFruit', async (req, res) => {
+  try {
+    const result = await FreshFruitCollections.find().toArray();
     res.send(result);
   } catch (error) {
     console.error("Error fetching menus:", error);
