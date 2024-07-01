@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const dotenv = require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const port = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
@@ -100,6 +100,40 @@ async function run() {
     }
   } catch (error) {
     console.error('Error fetching user info:', error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+app.delete('/cartDelete/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    const filter = { _id: new ObjectId(id) };
+    const result = await addToCartCollections.deleteOne(filter);
+    if (result.deletedCount > 0) {
+      res.send({ message: "Item successfully deleted", result });
+    } else {
+      res.status(404).send({ message: "Item not found" });
+    }
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
+app.delete('/orderDelete/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  try {
+    const filter = { _id: new ObjectId(id) };
+    const result = await allOrderCollections.deleteOne(filter);
+    if (result.deletedCount > 0) {
+      res.send({ message: "Item successfully deleted", result });
+    } else {
+      res.status(404).send({ message: "Item not found" });
+    }
+  } catch (error) {
+    console.error('Error deleting item:', error);
     res.status(500).send({ message: "Internal server error" });
   }
 });
