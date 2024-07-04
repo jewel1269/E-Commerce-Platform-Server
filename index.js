@@ -72,6 +72,28 @@ async function run() {
       res.send(result);
     });
 
+    app.patch('/myCartStatus/:id', async (req, res) => {
+      const id = req.params.id; // Correctly parse the ID
+      const { status } = req.body; // Destructure status from request body
+      console.log(id, status);
+    
+      try {
+        const filter = { _id: new ObjectId(id) }; // Convert ID to ObjectId
+        const updateDoc = {
+          $set: {
+            status: status
+          }
+        };
+    
+        const result = await addToCartCollections.updateOne(filter, updateDoc, {upsert: true});
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Error updating order status', error });
+      }
+    });
+
+
     app.get("/userInfo/:email", async (req, res) => {
       const email = req.params.email;
       console.log(email);
@@ -247,7 +269,8 @@ async function run() {
 
     app.post("/create-payment", async (req, res) => {
       try {
-        const paymentInfo = req.body;
+        const {orderDetails, user} = req.body;
+        console.log(orderDetails, user);
         const trxId= new ObjectId().toString().toLocaleUpperCase().slice(0,12)
     
         const initiatData = {
@@ -289,15 +312,27 @@ async function run() {
           }
         });
     
-        console.log(response.data);
+        
         
         const saveData = {
-          Customer_Name: "Jewel Mia",
-          paymentId: initiatData.tran_id,
-          amount: paymentInfo.amount,
-          status: 'pending'
 
+          Customer_info: user,
+          paymentId: initiatData.tran_id,
+          amount: orderDetails.amount,
+          details: orderDetails,
+          status: 'pending',
+          Date: new Date(),
+          Invoice:{
+            title: 'Tasty-Daily Ltd.',
+            logo: 'https://cdn.dribbble.com/users/1926893/screenshots/15607636/media/94d1d671c414ad83abf126c019825e28.png',
+            address: 'Uttara sector-10, Dhaka, Bangladesh',
+            Status: "Paid",
+            PaymentMethod: "Bkash"
+
+          }
         }
+
+
         const successPayment= await paymentCollections.insertOne(saveData)
         if(successPayment){
           res.send({
@@ -329,8 +364,39 @@ async function run() {
 
 
       console.log('success payment', successData, updateDate);
-      res.redirect("http://localhost:5173/SuccessPayment")
+      res.redirect("http://localhost:5173/dashboard/Payment")
     });
+
+
+    app.get('/paidItem/:email', async(req, res)=>{
+      const {email} = req.params
+      console.log("hello",email);
+      const filter = {'Customer_info.email': email}
+      const result = await paymentCollections.find(filter).toArray()
+      res.send(result)
+
+    })
+
+    app.patch('/paidOrder/:id', async (req, res) => {
+  const id = req.params.id; // Correctly parse the ID
+  const { status } = req.body; // Destructure status from request body
+  console.log(id, status);
+
+  try {
+    const filter = { _id: new ObjectId(id) }; // Convert ID to ObjectId
+    const updateDoc = {
+      $set: {
+        status: status
+      }
+    };
+
+    const result = await allOrderCollections.updateOne(filter, updateDoc);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error updating order status', error });
+  }
+});
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
