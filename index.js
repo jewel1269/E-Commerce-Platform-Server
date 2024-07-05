@@ -22,7 +22,7 @@ async function run() {
 
   try {
     // Connect the client to the server
-    await client.connect();
+    // await client.connect();
 
     const menuCollections = client.db("e-commerce-perform").collection("menus");
     const discountCollections = client
