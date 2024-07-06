@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded());
 app.use(cors());
 
 
@@ -21,8 +21,7 @@ async function run() {
   });
 
   try {
-    // Connect the client to the server
-    // await client.connect();
+    
 
     const menuCollections = client.db("e-commerce-perform").collection("menus");
     const discountCollections = client
@@ -404,8 +403,7 @@ async function run() {
   } catch (error) {
     console.error("An error occurred while connecting to MongoDB:", error);
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
+    
   }
 }
 
